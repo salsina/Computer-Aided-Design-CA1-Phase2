@@ -1,0 +1,30 @@
+module mult4_4(clk,rst,in1,in2,Asel,Bsel,mult_sel,ans_sel,out);
+input[3:0] in1,in2;
+input clk,Asel,Bsel,rst,mult_sel;
+output [7:0] out;
+input [1:0] ans_sel;
+wire [1:0] mux_A_out,mux_B_out;
+wire [3:0] mult2_2out,aftermult_and;
+wire [7:0] SE_out,shl2_out,shl4_out,adder_out,mux_ans_out;
+wire[1:0] reg1_1 ;
+wire[1:0] reg1_0 ;
+wire[1:0] reg2_1 ;
+wire[1:0] reg2_0 ;
+S2 s2_module1({3'b000,in1[3]},{2'b00},{2'b00},rst,clk,reg1_1[1]);
+S2 s2_module2({3'b000,in1[2]},{2'b00},{2'b00},rst,clk,reg1_1[0]);
+S2 s2_module3({3'b000,in1[1]},{2'b00},{2'b00},rst,clk,reg1_0[1]);
+S2 s2_module4({3'b000,in1[0]},{2'b00},{2'b00},rst,clk,reg1_0[0]);
+S2 s2_module5({3'b000,in2[3]},{2'b00},{2'b00},rst,clk,reg2_1[1]);
+S2 s2_module6({3'b000,in2[2]},{2'b00},{2'b00},rst,clk,reg2_1[0]);
+S2 s2_module7({3'b000,in2[1]},{2'b00},{2'b00},rst,clk,reg2_0[1]);
+S2 s2_module8({3'b000,in2[0]},{2'b00},{2'b00},rst,clk,reg2_0[0]);
+mux2_1 mux_A(reg1_1,reg1_0,Asel,mux_A_out);
+mux2_1 mux_B(reg2_1,reg2_0,Bsel,mux_B_out);
+mult2_2 multiplier(mux_A_out,mux_B_out,mult2_2out);
+mux2_1_4bit mux_after_mult(4'b0,mult2_2out,mult_sel,aftermult_and);
+assign SE_out = {4'b0,aftermult_and};
+mux4_1 mux_ans(8'b0,{SE_out[3:0],4'b0000},{SE_out[5:0],2'b00},SE_out,ans_sel,mux_ans_out);
+flipflop result(adder_out,clk,rst,out);
+adder adder_8bit(mux_ans_out,out,adder_out);
+endmodule
+//1514
